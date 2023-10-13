@@ -236,7 +236,7 @@ def send_text(message):
         bot.send_message(user_id, msg, parse_mode="Markdown")
         return
 
-    if message.text == "💸 Withdraw":
+if message.text == "💸 Withdraw":
         user_id = message.chat.id
         user = str(user_id)
 
@@ -324,7 +324,7 @@ def amo_with(message):
     add = "owner address"
     key = "private key"
     response = requests.post(url="https://crypto-space-pay.vercel.app/senddgb/"+data['wallet'][user]+"/"+add+"/"+key+"/"+str(amo)+"").json()
-    bot.send_message(user_id, response)
+    bot.send_message(user_id, response.get('result'))
     bot.send_message(user_id, "✅* Withdraw is request to our owner automatically\n\n💹 Payment Channel :- "+PAYMENT_CHANNEL +"*", parse_mode="Markdown")
 
     markupp = telebot.types.InlineKeyboardMarkup()
@@ -338,3 +338,4 @@ def amo_with(message):
 
 if name == 'main':
     bot.polling(none_stop=True)
+      
