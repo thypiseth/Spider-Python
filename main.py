@@ -1,18 +1,19 @@
 import time
 import json
 import telebot
+import requests
 
 ##TOKEN DETAILS
 TOKEN = "TRON"
 
-BOT_TOKEN = "6673510609:AAHm2YuprQrCB8933fs95HAyk1zcacBTTRk"
-PAYMENT_CHANNEL = "@ena_dgb" #add payment channel here including the '@' sign
-OWNER_ID = 2082161909 #write owner's user id here.. get it from @MissRose_Bot by /id
-CHANNELS = ["@ena_dgb"] #add channels to be checked here in the format - ["Channel 1", "Channel 2"] 
+BOT_TOKEN = "6737844360:AAGtZ61WaE3xDnrHVlkiCH0zS4L9RCcMvZw"
+PAYMENT_CHANNEL = "@enadgb" #add payment channel here including the '@' sign
+OWNER_ID = 5677958229 #write owner's user id here.. get it from @MissRose_Bot by /id
+CHANNELS = ["@enadgb"] #add channels to be checked here in the format - ["Channel 1", "Channel 2"] 
               #you can add as many channels here and also add the '@' sign before channel username
-Daily_bonus = 0.001 #Put daily bonus amount here!
+Daily_bonus = 100 #0.001 #Put daily bonus amount here!
 Mini_Withdraw = 0.5  #remove 0 and add the minimum withdraw u want to set
-Per_Refer = 0.0001 #add per refer bonus here
+Per_Refer = 0.5 #0.0001 #add per refer bonus here
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
@@ -236,106 +237,107 @@ def send_text(message):
         bot.send_message(user_id, msg, parse_mode="Markdown")
         return
 
-if message.text == "💸 Withdraw":
-        user_id = message.chat.id
-        user = str(user_id)
+    if message.text == "💸 Withdraw":
+        user_id = message.chat.id
+        user = str(user_id)
 
-        data = json.load(open('users.json', 'r'))
-        if user not in data['balance']:
-            data['balance'][user] = 0
-        if user not in data['wallet']:
-            data['wallet'][user] = "none"
-        json.dump(data, open('users.json', 'w'))
+        data = json.load(open('users.json', 'r'))
+        if user not in data['balance']:
+            data['balance'][user] = 0
+        if user not in data['wallet']:
+            data['wallet'][user] = "none"
+        json.dump(data, open('users.json', 'w'))
 
-        bal = data['balance'][user]
-        wall = data['wallet'][user]
-        if wall == "none":
-            bot.send_message(user_id, "_❌ wallet Not set_",
-                             parse_mode="Markdown")
-            return
-        if bal >= Mini_Withdraw:
-            bot.send_message(user_id, "_Enter Your Amount_",
-                             parse_mode="Markdown")
-            bot.register_next_step_handler(message, amo_with)
-        else:
-            bot.send_message(
-                user_id, f"_❌Your balance low you should have at least {Mini_Withdraw} {TOKEN} to Withdraw_", parse_mode="Markdown")
-            return
-   except:
-        bot.send_message(message.chat.id, "This command having error pls wait for ficing the glitch by admin")
-        bot.send_message(OWNER_ID, "Your bot got an error fix it fast!\n Error on command: "+message.text)
-        return
-
-def trx_address(message):
-   try:
-    if message.text == "🚫 Cancel":
-        return menu(message.chat.id)
-    if len(message.text) == 34:
-        user_id = message.chat.id
-        user = str(user_id)
-        data = json.load(open('users.json', 'r'))
-        data['wallet'][user] = message.text
-
-        bot.send_message(message.chat.id, "*💹Your Trx wallet set to " +
-                         data['wallet'][user]+"*", parse_mode="Markdown")
-        json.dump(data, open('users.json', 'w'))
-        return menu(message.chat.id)
-    else:
-        bot.send_message(
-            message.chat.id, "*⚠️ It's Not a Valid Trx Address!*", parse_mode="Markdown")
-        return menu(message.chat.id)
-   except:
-        bot.send_message(message.chat.id, "This command having error pls wait for ficing the glitch by admin")
-        bot.send_message(OWNER_ID, "Your bot got an error fix it fast!\n Error on command: "+message.text)
-        return
-
-def amo_with(message):
-   try:
-    user_id = message.chat.id
-    amo = message.text
-    user = str(user_id)
-    data = json.load(open('users.json', 'r'))
-    if user not in data['balance']:
-        data['balance'][user] = 0
-    if user not in data['wallet']:
-        data['wallet'][user] = "none"
-    json.dump(data, open('users.json', 'w'))
-
-    bal = data['balance'][user]
-    wall = data['wallet'][user]
-    msg = message.text
-    if msg.isdigit() == False:
-        bot.send_message(
-            user_id, "_📛 Invaild value. Enter only numeric value. Try again_", parse_mode="Markdown")
-        return
-    if int(message.text) < Mini_Withdraw:
-        bot.send_message(
-            user_id, f"_❌ Minimum withdraw {Mini_Withdraw} {TOKEN}_", parse_mode="Markdown")
-        return
-    if int(message.text) > bal:
-        bot.send_message(
-            user_id, "_❌ You Can't withdraw More than Your Balance_", parse_mode="Markdown")
-        return
-    amo = int(amo)
-    data['balance'][user] -= int(amo)
-    data['totalwith'] += int(amo)
-    bot_name = bot.get_me().username
-    json.dump(data, open('users.json', 'w'))
-    add = "owner address"
-    key = "private key"
-    response = requests.post(url="https://crypto-space-pay.vercel.app/senddgb/"+data['wallet'][user]+"/"+add+"/"+key+"/"+str(amo)+"").json()
-    bot.send_message(user_id, response.get('result'))
-    bot.send_message(user_id, "✅* Withdraw is request to our owner automatically\n\n💹 Payment Channel :- "+PAYMENT_CHANNEL +"*", parse_mode="Markdown")
-
-    markupp = telebot.types.InlineKeyboardMarkup()
-    markupp.add(telebot.types.InlineKeyboardButton(text='🍀 BOT LINK', url=f'https://telegram.me/{bot_name}?start={OWNER_ID}'))
-
-    send = bot.send_message(PAYMENT_CHANNEL,  "✅* New Withdraw\n\n⭐ Amount - "+str(amo)+f" {TOKEN}\n🦁 User - @"+message.from_user.username+"\n💠 Wallet* - "+data['wallet'][user]+"\n☎️ *User Referrals = "+str(data['referred'][user])+"\n\n🏖 Bot Link - @"+bot_name+"\n⏩ Please wait our owner will confrim it*", parse_mode="Markdown", disable_web_page_preview=True, reply_markup=markupp)
+        bal = data['balance'][user]
+        wall = data['wallet'][user]
+        if wall == "none":
+            bot.send_message(user_id, "_❌ wallet Not set_",
+                             parse_mode="Markdown")
+            return
+        if bal >= Mini_Withdraw:
+            bot.send_message(user_id, "_Enter Your Amount_",
+                             parse_mode="Markdown")
+            bot.register_next_step_handler(message, amo_with)
+        else:
+            bot.send_message(
+                user_id, f"_❌Your balance low you should have at least {Mini_Withdraw} {TOKEN} to Withdraw_", parse_mode="Markdown")
+            return
    except:
         bot.send_message(message.chat.id, "This command having error pls wait for ficing the glitch by admin")
         bot.send_message(OWNER_ID, "Your bot got an error fix it fast!\n Error on command: "+message.text)
         return
 
-if name == 'main':
+def trx_address(message):
+   try:
+    if message.text == "🚫 Cancel":
+        return menu(message.chat.id)
+    if len(message.text) == 34:
+        user_id = message.chat.id
+        user = str(user_id)
+        data = json.load(open('users.json', 'r'))
+        data['wallet'][user] = message.text
+
+        bot.send_message(message.chat.id, "*💹Your Trx wallet set to " +
+                         data['wallet'][user]+"*", parse_mode="Markdown")
+        json.dump(data, open('users.json', 'w'))
+        return menu(message.chat.id)
+    else:
+        bot.send_message(
+            message.chat.id, "*⚠️ It's Not a Valid Trx Address!*", parse_mode="Markdown")
+        return menu(message.chat.id)
+   except:
+        bot.send_message(message.chat.id, "This command having error pls wait for ficing the glitch by admin")
+        bot.send_message(OWNER_ID, "Your bot got an error fix it fast!\n Error on command: "+message.text)
+        return
+
+def amo_with(message):
+   try:
+    user_id = message.chat.id
+    amo = message.text
+    user = str(user_id)
+    data = json.load(open('users.json', 'r'))
+    if user not in data['balance']:
+        data['balance'][user] = 0
+    if user not in data['wallet']:
+        data['wallet'][user] = "none"
+    json.dump(data, open('users.json', 'w'))
+
+    bal = data['balance'][user]
+    wall = data['wallet'][user]
+    msg = message.text
+    if msg.isdigit() == False:
+        bot.send_message(
+            user_id, "_📛 Invaild value. Enter only numeric value. Try again_", parse_mode="Markdown")
+        return
+    if int(message.text) < Mini_Withdraw:
+        bot.send_message(
+            user_id, f"_❌ Minimum withdraw {Mini_Withdraw} {TOKEN}_", parse_mode="Markdown")
+        return
+    if int(message.text) > bal:
+        bot.send_message(
+            user_id, "_❌ You Can't withdraw More than Your Balance_", parse_mode="Markdown")
+        return
+    amo = int(amo)
+    data['balance'][user] -= int(amo)
+    data['totalwith'] += int(amo)
+    bot_name = bot.get_me().username
+    json.dump(data, open('users.json', 'w'))
+    #add = "owner address"
+    #key = "private key"
+    #response = requests.post(url="https://crypto-space-pay.vercel.app/senddgb/"+data['wallet'][user]+"/"+add+"/"+key+"/"+str(amo)+"").json()
+    #bot.send_message(user_id, response.get('result'))
+    bot.send_message(user_id, "✅* Withdraw is request to our owner automatically\n\n💹 Payment Channel :- "+PAYMENT_CHANNEL +"*", parse_mode="Markdown")
+
+    markupp = telebot.types.InlineKeyboardMarkup()
+    markupp.add(telebot.types.InlineKeyboardButton(text='🍀 BOT LINK', url=f'https://telegram.me/{bot_name}?start={OWNER_ID}'))
+
+    send = bot.send_message(PAYMENT_CHANNEL,  "✅* New Withdraw\n\n⭐ Amount - "+str(amo)+f" {TOKEN}\n🦁 User - @"+message.from_user.username+"\n💠 Wallet* - `"+data['wallet'][user]+"`\n☎️ *User Referrals = "+str(
+        data['referred'][user])+"\n\n🏖 Bot Link - @"+bot_name+"\n⏩ Please wait our owner will confrim it*", parse_mode="Markdown", disable_web_page_preview=True, reply_markup=markupp)
+   except:
+        bot.send_message(message.chat.id, "This command having error pls wait for ficing the glitch by admin")
+        bot.send_message(OWNER_ID, "Your bot got an error fix it fast!\n Error on command: "+message.text)
+        return
+
+if __name__ == '__main__':
     bot.polling(none_stop=True)
-      
+      
